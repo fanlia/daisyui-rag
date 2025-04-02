@@ -6,7 +6,11 @@ let model = 'qwen2.5:0.5b'
 let system_messages = []
 let history_messages = []
 
-const get_messages = async (content: string) => {
+const get_messages = async () => {
+  return [...system_messages, ...history_messages]
+}
+
+const add_messages = async (content: string) => {
   if (content.startsWith('/system')) {
     content = content.slice(7).trim()
     system_messages = [
@@ -52,6 +56,16 @@ const get_messages = async (content: string) => {
       .join('\n')
     console.log(`models:\n${names}`)
     return
+  } else if (content.startsWith('/dump')) {
+    try {
+      const filename = (content.slice(5).trim() || 'promp') + '.json'
+      const messages = await get_messages()
+      await Bun.write(filename, JSON.stringify(messages, null, 2))
+      console.log('prompt saved to', filename)
+    } catch (e) {
+      console.log('file invalid')
+    }
+    return
   } else if (!content) {
     return
   } else {
@@ -76,8 +90,8 @@ const prompt = 'you: '
 process.stdout.write(prompt)
 for await (const line of console) {
   process.stdout.write(`ollama: `)
-  const need_chat = await get_messages(line)
-  const messages = [...system_messages, ...history_messages]
+  const need_chat = await add_messages(line)
+  const messages = await get_messages()
   console.log({ messages, model })
   if (need_chat) {
     let content = ''
