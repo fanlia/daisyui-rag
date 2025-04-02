@@ -42,6 +42,7 @@ const get_messages = async (content: string) => {
     return
   } else if (content.startsWith('/clear')) {
     history_messages = []
+    return
   } else if (!content) {
     return
   } else {
