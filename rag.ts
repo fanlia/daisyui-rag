@@ -40,6 +40,8 @@ const get_messages = async (content: string) => {
       console.log('url invalid')
     }
     return
+  } else if (content.startsWith('/clear')) {
+    history_messages = []
   } else if (!content) {
     return
   } else {
