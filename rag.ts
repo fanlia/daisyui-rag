@@ -1,7 +1,7 @@
 import ollama from 'ollama'
 import * as cheerio from 'cheerio'
 
-const model = 'qwen2.5:0.5b'
+let model = 'qwen2.5:0.5b'
 
 let system_messages = []
 let history_messages = []
@@ -43,6 +43,9 @@ const get_messages = async (content: string) => {
   } else if (content.startsWith('/clear')) {
     history_messages = []
     return
+  } else if (content.startsWith('/model')) {
+    model = content.slice(6).trim()
+    return
   } else if (!content) {
     return
   } else {
@@ -69,7 +72,7 @@ for await (const line of console) {
   process.stdout.write(`ollama: `)
   const need_chat = await get_messages(line)
   const messages = [...system_messages, ...history_messages]
-  console.log({ messages })
+  console.log({ messages, model })
   if (need_chat) {
     let content = ''
     const response = await chat(messages)
