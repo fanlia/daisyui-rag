@@ -2,7 +2,7 @@ import ollama from 'ollama'
 
 const daisyui = await Bun.file('./daisyui.md').text()
 
-const model = 'deepseek-r1:latest'
+const model = 'deepseek-r1:1.5b'
 
 const chat = async (content: string) => {
   const messages = [
@@ -18,14 +18,18 @@ const chat = async (content: string) => {
   const response = await ollama.chat({
     model,
     messages,
+    stream: true,
   })
-  return response.message.content
+  return response
 }
 
 const prompt = 'you: '
 process.stdout.write(prompt)
 for await (const line of console) {
-  const res = await chat(line)
-  console.log(`ollama: ${res}`)
-  process.stdout.write(prompt)
+  process.stdout.write(`ollama: `)
+  const response = await chat(line)
+  for await (const part of response) {
+    process.stdout.write(part.message.content)
+  }
+  process.stdout.write(`\n${prompt}`)
 }
