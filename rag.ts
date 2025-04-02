@@ -24,13 +24,13 @@ const add_messages = async (content: string) => {
     try {
       content = await Bun.file(content.slice(5).trim()).text()
       history_messages.push({
-        role: 'assistant',
+        role: 'user',
         content,
       })
     } catch (e) {
       console.log('file invalid')
     }
-    return
+    return true
   } else if (content.startsWith('/url')) {
     try {
       content = await fetch(content.slice(4).trim())
@@ -42,13 +42,13 @@ const add_messages = async (content: string) => {
           return $('body').text().trim().replace(/\s+/g, ' ')
         })
       history_messages.push({
-        role: 'assistant',
+        role: 'user',
         content,
       })
     } catch (e) {
       console.log('url invalid')
     }
-    return
+    return true
   } else if (content.startsWith('/clear')) {
     history_messages = []
     return
