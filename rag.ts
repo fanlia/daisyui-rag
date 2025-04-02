@@ -35,7 +35,12 @@ const add_messages = async (content: string) => {
     try {
       content = await fetch(content.slice(4).trim())
         .then((res) => res.text())
-        .then((html) => cheerio.load(html).text().trim())
+        .then((html) => {
+          const $ = cheerio.load(html)
+          $('script').remove()
+          $('style').remove()
+          return $('body').text().trim().replace(/\s+/g, ' ')
+        })
       history_messages.push({
         role: 'assistant',
         content,
