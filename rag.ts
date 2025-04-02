@@ -46,6 +46,12 @@ const get_messages = async (content: string) => {
   } else if (content.startsWith('/model')) {
     model = content.slice(6).trim()
     return
+  } else if (content.startsWith('/list')) {
+    const names = (await ollama.list().then((res) => res.models))
+      .map((d) => `- ${d.model}`)
+      .join('\n')
+    console.log(`models:\n${names}`)
+    return
   } else if (!content) {
     return
   } else {
